@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components\queryBuilder;
+namespace netis\queryBuilder;
 
 use yii\db\ActiveQuery;
 

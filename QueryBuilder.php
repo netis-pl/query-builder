@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components\queryBuilder;
+namespace netis\queryBuilder;
 
 use Gdbots\QueryParser\Enum\BoolOperator;
 use Gdbots\QueryParser\Enum\ComparisonOperator;
@@ -45,11 +45,11 @@ final class QueryBuilder
 
     /** @var ActiveQuery */
     private $query;
-    /** @var QueryParser  */
+    /** @var QueryParser */
     private $parser;
     /** @var int */
     private $paramCounter = 0;
-    /** @var string|null  */
+    /** @var string|null */
     private $queryString;
     /** @var Connection */
     private $db;
@@ -76,15 +76,15 @@ final class QueryBuilder
     public function __construct(ActiveQuery $query, string $queryString = null, array $hashtags = [])
     {
         /** @var Application|\yii\console\Application $app */
-        $app = Yii::$app;
+        $app               = Yii::$app;
         $this->queryString = trim($queryString) === '' ? null : $queryString;
-        $this->query   = $query;
-        $this->parser  = new LuceneQueryParser();
-        $this->db      = $app->getDb();
+        $this->query       = $query;
+        $this->parser      = new LuceneQueryParser();
+        $this->db          = $app->getDb();
         $this->paramPrefix = uniqid(':lucene_qb_') . '_';
-        $this->hashtags = $hashtags;
-        $model = new $this->query->modelClass;
-        $this->tableName = $model->tableName();
+        $this->hashtags    = $hashtags;
+        $model             = new $this->query->modelClass;
+        $this->tableName   = $model->tableName();
     }
 
     /**
@@ -199,15 +199,15 @@ final class QueryBuilder
     private function processFieldNode(Field $node)
     {
         /** @var ActiveRecord $model */
-        $model      = new $this->query->modelClass;
-        $tableName  = null;
-        $columns = [];
+        $model     = new $this->query->modelClass;
+        $tableName = null;
+        $columns   = [];
         foreach ($model::getTableSchema()->columns as $key => $column) {
-            $clonedColumn = clone $column;
+            $clonedColumn       = clone $column;
             $clonedColumn->name = $this->tableName . '.' . $column->name;
-            $columns[$key] = $clonedColumn;
+            $columns[$key]      = $clonedColumn;
         }
-        $field      = $node->getValue();
+        $field = $node->getValue();
 
         /** @var ActiveQuery|ActiveQueryInterface|null $relation */
         $relation = $model->getRelation($field, false);
@@ -257,10 +257,10 @@ final class QueryBuilder
         }
 
         $operatorValue = $boolOperator->getValue();
-        $op = $operatorValue === BoolOperator::PROHIBITED ? 'NOT IN' : 'IN';
-        $method = $operatorValue === BoolOperator::OPTIONAL ? 'orWhere' : 'andWhere';
+        $op            = $operatorValue === BoolOperator::PROHIBITED ? 'NOT IN' : 'IN';
+        $method        = $operatorValue === BoolOperator::OPTIONAL ? 'orWhere' : 'andWhere';
         if (in_array($column->type, self::TYPE_STRING)) {
-            $op = $operatorValue === BoolOperator::PROHIBITED ? '!~*' : '~*';
+            $op     = $operatorValue === BoolOperator::PROHIBITED ? '!~*' : '~*';
             $values = '(' . implode('|', $values) . ')';
         }
 
@@ -286,11 +286,11 @@ final class QueryBuilder
         $params     = [];
 
         foreach ($this->prepareColumns(self::TYPE_DATE, $column) as $column) {
-            $comparison    = $this->resolveComparison($node->getComparisonOperator(), $boolOperator, $column->type);
-            $dateTime = $node->toDateTime()->format('H:i') === '00:00' ? $node->toDateTime()->format('Y-m-d') : $node->toDateTime()->format(\DateTime::ATOM);
-            $value         = in_array($column->type, self::TYPE_STRING) ? ('%' . $node->getValue() . '%') : $dateTime;
-            $operatorValue = $boolOperator->getValue();
-            $param         = $this->paramPrefix . $this->paramCounter++;
+            $comparison     = $this->resolveComparison($node->getComparisonOperator(), $boolOperator, $column->type);
+            $dateTime       = $node->toDateTime()->format('H:i') === '00:00' ? $node->toDateTime()->format('Y-m-d') : $node->toDateTime()->format(\DateTime::ATOM);
+            $value          = in_array($column->type, self::TYPE_STRING) ? ('%' . $node->getValue() . '%') : $dateTime;
+            $operatorValue  = $boolOperator->getValue();
+            $param          = $this->paramPrefix . $this->paramCounter++;
             $params[$param] = $value;
 
             $colName = $tableName === null ? $column->name : "$tableName.{$column->name}";
@@ -340,7 +340,7 @@ final class QueryBuilder
             }
             $comparison = $this->resolveComparison($node->getComparisonOperator(), $boolOperator, $column->type);
             $value      = in_array($column->type, self::TYPE_STRING) ? ('%' . $node->getValue() . '%') : $node->getValue();
-            $param = $this->paramPrefix . $this->paramCounter;
+            $param      = $this->paramPrefix . $this->paramCounter;
             $this->paramCounter++;
             $params[$param] = $value;
             $colName        = $tableName === null ? $column->name : "$tableName.{$column->name}";
@@ -426,18 +426,18 @@ final class QueryBuilder
         $operatorValue = $boolOperator->getValue();
 
         $conditions = [$operatorValue != BoolOperator::PROHIBITED ? 'OR' : 'AND'];
-        $param = $this->paramPrefix . $this->paramCounter++;
-        $nodeValue = $node->getValue();
-        $params = [$param => '%' . $nodeValue . '%'];
+        $param      = $this->paramPrefix . $this->paramCounter++;
+        $nodeValue  = $node->getValue();
+        $params     = [$param => '%' . $nodeValue . '%'];
 
         foreach ($this->prepareColumns(self::TYPE_STRING, $column) as $column) {
             $colName = $tableName === null ? $column->name : "$tableName.{$column->name}";
             if (in_array($column->dbType, self::TYPE_INET)) {
                 $validator = new IpValidator();
                 if ($validator->validate($nodeValue)) {
-                    $inetParam = $this->paramPrefix . $this->paramCounter++;
+                    $inetParam          = $this->paramPrefix . $this->paramCounter++;
                     $params[$inetParam] = $nodeValue;
-                    $conditions[] = "$colName = $inetParam";
+                    $conditions[]       = "$colName = $inetParam";
                 }
                 continue;
             }
@@ -495,18 +495,18 @@ final class QueryBuilder
 
         $operator = $node->isExclusive() ? '' : '=';
 
-        $where = ['AND'];
-        $params = [];
+        $where      = ['AND'];
+        $params     = [];
         $columnName = $tableName === null ? $column->name : $tableName . '.' . $column->name;
         if ($lowerNode !== null) {
-            $param = $this->paramPrefix . $this->paramCounter++;
-            $where[] = "{$columnName} >{$operator} {$param}";
+            $param          = $this->paramPrefix . $this->paramCounter++;
+            $where[]        = "{$columnName} >{$operator} {$param}";
             $params[$param] = $lowerNode->getValue();
         }
 
         if ($upperNode !== null) {
-            $param = $this->paramPrefix . $this->paramCounter++;
-            $where[] = "{$columnName} <{$operator} {$param}";
+            $param          = $this->paramPrefix . $this->paramCounter++;
+            $where[]        = "{$columnName} <{$operator} {$param}";
             $params[$param] = $upperNode->getValue();
         }
 
@@ -532,12 +532,12 @@ final class QueryBuilder
      */
     private function processRelation($field, $node)
     {
-        $data = explode('.', $field, 2);
+        $data         = explode('.', $field, 2);
         $relationName = $data[0];
         /** @var ActiveRecord $model */
-        $model         = new $this->query->modelClass;
+        $model = new $this->query->modelClass;
         /** @var ActiveQuery|null $relation */
-        $relation      = $model->getRelation($relationName, false);
+        $relation = $model->getRelation($relationName, false);
         if ($relation === null) {
             $message = Yii::t('app', '{model} has no relation named {relation}', [
                 'model'    => get_class($model),
@@ -550,12 +550,12 @@ final class QueryBuilder
         $relationModel = new $relation->modelClass;
         $relationTable = $relationModel->tableName();
         //phpcs:ignore PHPCS_SecurityAudit.BadFunctions.FilesystemFunctions.WarnWeirdFilesystem
-        $relationLink  = $relation->link;
+        $relationLink = $relation->link;
 
         $primaryKey = $relationModel::getTableSchema()->primaryKey;
         if (count($primaryKey) !== 1 && count($data) !== 2) {
             $message = Yii::t('app', 'Related model {model} must define attribute to search for or have one column primary key', [
-                'model'    => get_class($relationModel),
+                'model' => get_class($relationModel),
             ]);
             throw new HttpException(400, $message);
         }

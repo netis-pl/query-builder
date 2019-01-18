@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components\queryBuilder;
+namespace netis\queryBuilder;
 
 use Gdbots\QueryParser\Enum\BoolOperator;
 use Gdbots\QueryParser\QueryParser;
@@ -19,10 +19,7 @@ class LuceneQueryParser extends QueryParser
      */
     protected function getBoolOperator(int $default = BoolOperator::REQUIRED): BoolOperator
     {
-        if ($this->stream->nextIf(Token::T_REQUIRED)
-            || $this->stream->lookaheadTypeIs(Token::T_AND)
-            || $this->stream->prevTypeIs(Token::T_AND)
-        ) {
+        if ($this->stream->nextIf(Token::T_REQUIRED) || $this->stream->lookaheadTypeIs(Token::T_AND) || $this->stream->prevTypeIs(Token::T_AND)) {
             return BoolOperator::REQUIRED();
         }
 

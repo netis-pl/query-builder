@@ -4,19 +4,24 @@
   "homepage": "http://www.netis.pl/",
   "type": "library",
   "license": "Apache-2.0",
-  "repositories": [
+  "authors": [
     {
-      "type": "vcs",
-      "url": "https://github.com/netis-pl/query-builder.git"
+      "name": "Tomasz Mężyński",
+      "email": "tmezynski@netis.pl"
+    },
+    {
+      "name": "Michał Motyczko",
+      "email": "mmotyczko@netis.pl"
     }
   ],
   "require": {
     "php": ">=7.1",
+    "yiisoft/yii2": ">=2.0.5",
     "gdbots/query-parser": "dev-master"
   },
   "autoload": {
     "psr-4": {
-      "netis\\query-builder\\": ""
+      "netis\\queryBuilder": ""
     }
   }
 }
