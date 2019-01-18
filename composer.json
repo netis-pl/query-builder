@@ -1,0 +1,22 @@
+{
+  "name": "netis/query-builder",
+  "description": "QueryBuilder for Yii2",
+  "homepage": "http://www.netis.pl/",
+  "type": "library",
+  "license": "Apache-2.0",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/netis-pl/query-builder.git"
+    }
+  ],
+  "require": {
+    "php": ">=7.1",
+    "gdbots/query-parser": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "netis\\query-builder\\": ""
+    }
+  }
+}
